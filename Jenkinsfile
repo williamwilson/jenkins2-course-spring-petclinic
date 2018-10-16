@@ -19,27 +19,33 @@ pipeline {
             steps {
                 notify('Started')
 
-                try {
-                    stage('checkout') {
+                //try {
+                  //  stage('checkout') {
                         git 'https://github.com/williamwilson/jenkins2-course-spring-petclinic.git'
-                    }
+                   // }
 
-                    stage('build') {
+                   // stage('build') {
                         sh 'mvn clean package'
-                    }
-                }
-                catch (err) {
-                    notify("Error ${err}")
-                    currentBuild.result = 'FAILURE'
-                }
+                   // }
+                //}
+                //catch (err) {
+                //    notify("Error ${err}")
+                //    currentBuild.result = 'FAILURE'
+                //}
 
-                stage('archive') {
+                //stage('archive') {
                     step([$class: 'JUnitResultArchiver', testResults: 'target/surefire-reports/TEST-*.xml'])
                     archiveArtifacts "target/*.?ar"
-                }
+                //}
 
                 notify('Done')
             }
+        }
+    }
+
+    post {
+        always {
+            notify('Done')
         }
     }
 }
