@@ -1,4 +1,5 @@
 pipeline {
+    agent any
     parameters {
         string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
 
@@ -13,29 +14,31 @@ pipeline {
         file(name: "FILE", description: "Choose a file to upload")
     }
 
-    node {
-        notify('Started')
-        
-        try {
-            stage('checkout') {
-                git 'https://github.com/williamwilson/jenkins2-course-spring-petclinic.git'
+    stages {
+        stage('1') {
+            notify('Started')
+
+            try {
+                stage('checkout') {
+                    git 'https://github.com/williamwilson/jenkins2-course-spring-petclinic.git'
+                }
+
+                stage('build') {
+                    sh 'mvn clean package'
+                }
             }
-        
-            stage('build') {
-                sh 'mvn clean package'
+            catch (err) {
+                notify("Error ${err}")
+                currentBuild.result = 'FAILURE'
             }
+
+            stage('archive') {
+                step([$class: 'JUnitResultArchiver', testResults: 'target/surefire-reports/TEST-*.xml'])
+                archiveArtifacts "target/*.?ar"
+            }
+
+            notify('Done')
         }
-        catch (err) {
-            notify("Error ${err}")
-            currentBuild.result = 'FAILURE'
-        }
-        
-        stage('archive') {
-            step([$class: 'JUnitResultArchiver', testResults: 'target/surefire-reports/TEST-*.xml'])
-            archiveArtifacts "target/*.?ar"
-        }
-        
-        notify('Done')
     }
 }
 
