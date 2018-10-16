@@ -19,19 +19,21 @@ pipeline {
             steps {
                 notify('Started')
 
-                //try {
-                  //  stage('checkout') {
-                        git 'https://github.com/williamwilson/jenkins2-course-spring-petclinic.git'
-                   // }
+                script {
+                    try {
+                    //  stage('checkout') {
+                            git 'https://github.com/williamwilson/jenkins2-course-spring-petclinic.git'
+                    // }
 
-                   // stage('build') {
-                        sh 'mvn clean package'
-                   // }
-                //}
-                //catch (err) {
-                //    notify("Error ${err}")
-                //    currentBuild.result = 'FAILURE'
-                //}
+                    // stage('build') {
+                            sh 'mvn clean package'
+                    // }
+                    }
+                    catch (err) {
+                        notify("Error ${err}")
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
 
                 //stage('archive') {
                     step([$class: 'JUnitResultArchiver', testResults: 'target/surefire-reports/TEST-*.xml'])
